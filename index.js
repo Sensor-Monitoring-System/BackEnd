@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 var connection = new mysql({
     host : 'localhost',
     user : 'root',
-    password : '/* my pwd */',
+    password : 'my password',
     database : 'opensource'
 });
 
@@ -64,7 +64,7 @@ app.post('/temperature', function(req, res) {
         function (rowsLength, callback) {
             var idValidate;
             if(rowsLength != 0) {
-                connection.query('insert into temperature values("'+id+'", now(2), '+value+');');
+                connection.query('insert into temperature values("'+id+'", now(), '+value+');');
                 idValidate = true;
             }
             else
@@ -72,16 +72,33 @@ app.post('/temperature', function(req, res) {
             callback(null, idValidate);
         },
         function(idValidate, callback) {
-            var result;
             if(idValidate) {
-                var rows = connection.query('select C_DT, C_Value from temperature where user_Id ="'+id+ '" order by C_DT desc limit 1');
+                var rows = connection.query('select CONVERT_TZ(C_DT, "+0:00","+9:00") as C_DT, C_Value from temperature where user_Id ="'+id+ '" order by C_DT desc limit 1');
                 var C_DT = rows[0].C_DT;
                 var C_Value = rows[0].C_Value;
-                result = { 
-                    C_DT,
-                    C_Value                  
-                 };
             }
+            callback(null, C_DT, C_Value);
+        },
+        function (dt, value, callback) {
+            var result;
+            var tokenizedDate = new Array();
+            tokenizedDate.push(dt.substring(0,4));
+            tokenizedDate.push(dt.substring(5,7));
+            tokenizedDate.push(dt.substring(8,10));
+            tokenizedDate.push(dt.substring(11,13));
+            tokenizedDate.push(dt.substring(14,16));
+            tokenizedDate.push(dt.substring(17,22));
+
+            result = {
+                "year" : tokenizedDate[0],
+                "month" : tokenizedDate[1],
+                "day" : tokenizedDate[2], 
+                "hour" : tokenizedDate[3],
+                "minute" : tokenizedDate[4],
+                "second" : tokenizedDate[5],
+                "value" : value
+            }
+
             callback(null, result);
         }
     ],
@@ -101,6 +118,11 @@ app.post('/temperature', function(req, res) {
                "SH_Value": 50
              }
 */
+app.get('/', function(req, res ) {
+    var rows=connection.query('select * from temperature order by C_DT desc limit 1');
+    console.log(rows[0].C_DT);
+    res.send(rows[0].C_DT);
+})
 
 
 // 초음파 거리 값 받기
