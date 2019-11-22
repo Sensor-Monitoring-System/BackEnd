@@ -1,0 +1,56 @@
+CREATE TABLE user (
+  user_Id varchar(100) NOT NULL,
+  user_Pwd varchar(100) not null,
+  PRIMARY KEY (user_Id)
+);
+
+CREATE TABLE illuminance (   
+	user_Id varchar(100) Not Null,
+	lux_Value double not null,
+    lux_DT datetime(2), 
+	FOREIGN KEY (user_Id) REFERENCES user (user_Id),
+    PRIMARY KEY (lux_DT) 
+);
+
+CREATE TABLE temperature (   
+	user_Id varchar(100) Not Null,
+	C_Value double not null,
+	C_DT datetime(2),   
+	FOREIGN KEY (user_Id) REFERENCES user (user_Id),
+    PRIMARY KEY (C_DT) 
+);
+
+CREATE TABLE humidity (   
+	user_Id varchar(100) Not Null,
+    SH_DT datetime(2),   
+	SH_Value double not null,
+	FOREIGN KEY (user_Id) REFERENCES user (user_Id),
+    PRIMARY KEY (SH_DT) 
+);
+
+CREATE TABLE ultrasound (   
+	user_Id varchar(100) Not Null,
+    dist_DT datetime(2),   
+	dist_Value double not null,
+    FOREIGN KEY (user_Id) REFERENCES user (user_Id),
+    PRIMARY KEY (dist_DT) 
+);
+
+CREATE TABLE `particulate_matter2.5` (   
+	user_Id varchar(100) Not Null,
+    `pm2.5_DT` datetime(2),   
+	`pm2.5_Value` double not null,
+	FOREIGN KEY (user_Id) REFERENCES user (user_Id),
+    PRIMARY KEY (`pm2.5_DT`) 
+);
+
+CREATE TABLE `particulate_matter10` (   
+	user_Id varchar(100) Not Null,
+    pm10_DT datetime(2),   
+	pm10_Value double not null,
+	FOREIGN KEY (user_Id) REFERENCES user (user_Id),
+    PRIMARY KEY (pm10_DT) 
+);
+
+
+
