@@ -26,6 +26,12 @@ var connection = new mysql({
     database : 'opensource'
 });
 
+
+app.post('/texttest', function(req,res) {  
+    var text = req.query.text;
+    console.log(text);
+    res.send(text);
+});
  
 // client 요청으로 가장 최근의 센서 값 응답하기  
 // GET : ---.--.---.--/client/ 해당 센서 /current
@@ -35,20 +41,23 @@ var connection = new mysql({
 app.get('/client/temperature/current', function(req,res) {
     async.waterfall([
         function (callback) {
-            var rows = connection.query('select C_Value from temperature  order by C_DT desc limit 1');
+            var rows = connection.query('select * from temperature  order by C_DT desc limit 1');
             callback(null, rows);
         },
         function (rows, callback) {
             var value = rows[0].C_Value;
-            callback(null, value);
+            var time = rows[0].C_DT;
+            callback(null, value, time);
         }
     ],
-        function (err, value) {
+        function (err, value, time) {
             console.log(value);
             var v = value;
             var json = new Array();
 
-            json.push( {"value" : v} ) ;
+            json.push( {"value" : v,
+                        "time" : time,
+                        "sensor" : "temperature"} ) ;
             res.send(json);
         }
     )
@@ -585,13 +594,13 @@ app.get('/particulate_matter10', function(req, res) {
 
 
 app.get('/', function(req, res ) {
-    var rows=connection.query('select * from temperature order by C_DT desc limit 1');
-    console.log(rows[0].C_DT);
-    res.send(rows[0].C_DT);
+    var value = "succeed";
+    console.log(value);
+    res.send(value);
 })
 
 
 
 app.listen(80, function () {
-    console.log('Server is running ');
+    console.log('Server is running');
 });
